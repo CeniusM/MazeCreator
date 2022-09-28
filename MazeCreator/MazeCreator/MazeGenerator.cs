@@ -138,7 +138,10 @@ internal class MazeGenerator
         for (int i = 0; i < walkersCount; i++)
             walkers.Add(new Walker(new Coord(startX, startY)));
     }
-
+    
+    // one problem may be that the middle roads pretty much allways leads the the end,
+    // one way of fixing this is maby to slow down the closer they get to the end compared to how far the other workers are
+    // and the further away they are the faster they will get
     public void StepForward(int steps = 1)
     {
         if (done)
