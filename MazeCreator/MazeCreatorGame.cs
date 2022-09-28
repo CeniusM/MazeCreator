@@ -161,7 +161,7 @@ internal class MazeCreatorGUI
 
 
         SDL.SDL_RenderPresent(renderer);
-    }
+        }
 
     public void CleanUp()
     {
