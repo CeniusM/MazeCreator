@@ -85,8 +85,6 @@ internal class Walker
         coordsTestet.Contains(new Coord(x, y))
         );
 
-        Console.WriteLine("(" + x + "," + y + ")");
-
         return new Coord(x, y);
     }
 

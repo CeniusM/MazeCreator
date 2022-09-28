@@ -5,11 +5,11 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public const int MazeHeight = 40; // the maze's dimensions
-    public const int MazeWidth = 40;
-    public const int BlockHeight = 10; // each block in maze dimensions in pixels
-    public const int BlockWidth = 10;
-    public const int BlockWallCelingWidth = 2; // the width of the wall and celling/floor lines *needs better name
+    public const int MazeHeight = 200; // the maze's dimensions
+    public const int MazeWidth = 200;
+    public const int BlockHeight = 5; // each block in maze dimensions in pixels
+    public const int BlockWidth = 5;
+    public const int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
 
     //private World.World world;
     //private Renderer.WorldRenderer worldRender;
