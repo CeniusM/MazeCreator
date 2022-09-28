@@ -5,10 +5,10 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public const int MazeHeight = 50; // the maze's dimensions
-    public const int MazeWidth = 50;
-    public const int BlockHeight = 15; // each block in maze dimensions in pixels
-    public const int BlockWidth = 15;
+    public const int MazeHeight = 40; // the maze's dimensions
+    public const int MazeWidth = 40;
+    public const int BlockHeight = 10; // each block in maze dimensions in pixels
+    public const int BlockWidth = 10;
     public const int BlockWallCelingWidth = 2; // the width of the wall and celling/floor lines *needs better name
 
     //private World.World world;
@@ -78,12 +78,12 @@ internal class MazeCreatorGUI
 
         // horizantal wall
         rectHor.h = BlockWallCelingWidth;
-        rectHor.w = BlockHeight;
+        rectHor.w = BlockWidth;
         rectHor.x = 0;
         rectHor.y = 0;
 
         // vertical celling/floor
-        rectVer.h = BlockWidth;
+        rectVer.h = BlockHeight;
         rectVer.w = BlockWallCelingWidth;
         rectVer.x = 0;
         rectVer.y = 0;
@@ -103,7 +103,7 @@ internal class MazeCreatorGUI
     public void Update(float delta = 17f)
     {
         if (!_paused)
-        mazeGenerator.StepForward();
+            mazeGenerator.StepForward();
     }
 
     public void Render(float delta)
@@ -161,9 +161,19 @@ internal class MazeCreatorGUI
             }
         }
 
+        //  +- BlockWallCelingWidth so it dosent block the walls
+        rect.x = mazeGenerator.startX * BlockWidth - BlockWallCelingWidth;
+        rect.y = mazeGenerator.startY * BlockWidth - BlockWallCelingWidth;
+        SDL.SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL.SDL_RenderFillRect(renderer, ref rect);
+        rect.x = mazeGenerator.endX * BlockWidth + BlockWallCelingWidth;
+        rect.y = mazeGenerator.endY * BlockWidth + BlockWallCelingWidth;
+        SDL.SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL.SDL_RenderFillRect(renderer, ref rect);
+
 
         SDL.SDL_RenderPresent(renderer);
-        }
+    }
 
     public void CleanUp()
     {

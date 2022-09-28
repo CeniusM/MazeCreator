@@ -7,3 +7,7 @@ the rest will be storing each square
 goes from top left to right (top left is 0,0) and a line is the width
 
 each square will have 4 bytes {Up, Down, Left, Right}(bool)
+
+
+ideers*
+maby have some saved for the winning trail
