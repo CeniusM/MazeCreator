@@ -5,16 +5,17 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public const int MazeHeight = 20; // the maze's dimensions
-    public const int MazeWidth = 20;
-    public const int BlockHeight = 20; // each block in maze dimensions in pixels
-    public const int BlockWidth = 20;
+    public const int MazeHeight = 50; // the maze's dimensions
+    public const int MazeWidth = 50;
+    public const int BlockHeight = 15; // each block in maze dimensions in pixels
+    public const int BlockWidth = 15;
     public const int BlockWallCelingWidth = 2; // the width of the wall and celling/floor lines *needs better name
 
     //private World.World world;
     //private Renderer.WorldRenderer worldRender;
 
     private bool _isRunning = true;
+    private bool _paused = false;
 
     private static IntPtr window;
     private static IntPtr renderer;
@@ -94,13 +95,14 @@ internal class MazeCreatorGUI
         {
             if (e.type == SDL.SDL_EventType.SDL_QUIT)
                 _isRunning = false;
-            //else
-            //    world.Event(ref e);
+            else if (e.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
+                _paused = !_paused;
         }
     }
 
     public void Update(float delta = 17f)
     {
+        if (!_paused)
         mazeGenerator.StepForward();
     }
 

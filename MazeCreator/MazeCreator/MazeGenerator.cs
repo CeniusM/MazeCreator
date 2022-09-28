@@ -1,7 +1,12 @@
-﻿// biggest problem
-// the branches basicly comes from the end, two ways of fixing, just run the algorithm backwards/change start and end
-// or make the path and go through the start to the end
-
+﻿//// biggest problem
+//// the branches basicly comes from the end, two ways of fixing, just run the algorithm backwards/change start and end
+//// or make the path and go through the start to the end
+//
+// biggest problem, is the fact that there is an equel amout of branches on the end as in the front, there isent relly alot of branches
+// not sure how to fix the fackt there isent alot
+// one way i can think of is to have a serten amount of walkers at once(the tracer thingy(currentX,currentY))
+// so that from the start it goes out in more directions
+// and whenever one dies, another one spawns from one of the other ones
 
 
 using System;
@@ -41,10 +46,6 @@ internal class MazeGenerator
 
     private Stack<Coord> trail;
 
-    private bool FindingWinningTrail = true;
-    private bool UsingWinningTrail = false;
-    private bool UsingTrailStack = false;
-
     private int currentX;
     private int currentY;
 
@@ -53,7 +54,7 @@ internal class MazeGenerator
         blockHasInit = new bool[width, height];
         maze = new Maze(width, height);
         step = 0;
-        stepsNeeded = width * height - 1;
+        stepsNeeded = width * height;
         trail = new(width * height);
 
         // currently starts in top right and ends in buttom left
@@ -124,7 +125,12 @@ internal class MazeGenerator
                         // and make branches from there instead of from the end
                         if (currentX == endX && currentY == endY)
                         {
-                            trail.Reverse();
+                            List<Coord> newTrail = new List<Coord>(trail.Count());
+                            for (int foo = 0; foo < trail.Count(); foo++)
+                                newTrail.Add(trail.Pop());
+                            for (int foo = 0; foo < newTrail.Count(); foo++)
+                                trail.Push(newTrail[foo]);
+
                             currentX = startX;
                             currentY = startY;
                             step++;
@@ -152,6 +158,7 @@ internal class MazeGenerator
                     Coord coord = trail.Pop();
                     currentX = coord.x;
                     currentY = coord.y;
+                    Console.WriteLine("(" + currentX + "," + currentY + ")");
                     break;
                 }
             }
