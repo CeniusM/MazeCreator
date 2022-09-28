@@ -5,14 +5,13 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public const int MazeHeight = 200; // the maze's dimensions
-    public const int MazeWidth = 200;
-    public const int BlockHeight = 5; // each block in maze dimensions in pixels
-    public const int BlockWidth = 5;
-    public const int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
-
-    //private World.World world;
-    //private Renderer.WorldRenderer worldRender;
+    public const int MazeHeight = 20; // the maze's dimensions
+    public const int MazeWidth = 20;
+    public const int BlockHeight = 20; // each block in maze dimensions in pixels
+    public const int BlockWidth = 20;
+    public const int BlockWallCelingWidth = 6; // the width of the wall and celling/floor lines *needs better name
+    public const int HalfBlockWallCelingWidth = BlockWallCelingWidth >> 1; // used to remove jaget cornors at wider walls -
+    // only problem is that you also have to move every wall this amount up(rectVer) or the the left(rectHor), and make it BlockWallCelingWidth taller and wider
 
     private bool _isRunning = true;
     private bool _paused = false;

@@ -1,13 +1,12 @@
-﻿//// biggest problem
-//// the branches basicly comes from the end, two ways of fixing, just run the algorithm backwards/change start and end
-//// or make the path and go through the start to the end
+﻿// problems*
+// alot of artifacting at the end and begining of the sims
+// maby make them spawn and despawn depending on some facktors that has to do with hpw much they are squishing
 //
-// biggest problem, is the fact that there is an equel amout of branches on the end as in the front, there isent relly alot of branches
-// not sure how to fix the fackt there isent alot
-// one way i can think of is to have a serten amount of walkers at once(the tracer thingy(currentX,currentY))
-// so that from the start it goes out in more directions
-// when ever one cant go forward, it will follow back the trail, if it gets back to start, it dies
-// and whenever one dies, another one spawns from one of the other ones
+// alot if long kinda wires, fewer walkers the less of a problem
+//
+// one problem may be that the middle roads pretty much allways leads the the end,
+// one way of fixing this is maby to slow down the closer they get to the end compared to how far the other workers are
+// and the further away they are the faster they will get
 
 
 using System;
@@ -115,13 +114,15 @@ internal class MazeGenerator
     // amount of blocks that have been init
     public int step;
     public int stepsNeeded;
+    public int stepsPerRound;
 
-    public MazeGenerator(int width, int height, int walkersCount = -1)
+    public MazeGenerator(int width, int height, int walkersCount = -1, int stepsPerRound = 1)
     {
         blockHasInit = new bool[width, height];
         maze = new Maze(width, height);
         step = 0;
         stepsNeeded = width * height;
+        this.stepsPerRound = stepsPerRound;
 
         // currently starts in top right and ends in buttom left
         startX = 0;
@@ -138,15 +139,13 @@ internal class MazeGenerator
         for (int i = 0; i < walkersCount; i++)
             walkers.Add(new Walker(new Coord(startX, startY)));
     }
-    
-    // one problem may be that the middle roads pretty much allways leads the the end,
-    // one way of fixing this is maby to slow down the closer they get to the end compared to how far the other workers are
-    // and the further away they are the faster they will get
-    public void StepForward(int steps = 1)
+
+    public void StepForward(int steps = -1)
     {
         if (done)
             return;
-
+        if (steps == -1)
+            steps = stepsPerRound;
         for (int i = 0; i < steps; i++)
         {
             // generation code
@@ -218,7 +217,7 @@ internal class MazeGenerator
                     // check if landed on end
                     if (newPos.x == endX && newPos.y == endY)
                     {
-
+                        
                     }
 
                     break;
