@@ -1,6 +1,7 @@
 ﻿using SDL2Lib;
+using MazeCreator;
 
-namespace Interfaces;
+namespace GUI;
 
 internal class MazeCreatorGUI
 {
@@ -8,14 +9,21 @@ internal class MazeCreatorGUI
     public const int MazeWidth = 20;
     public const int BlockHeight = 20; // each block in maze dimensions in pixels
     public const int BlockWidth = 20;
+    public const int BlockWallCelingWidth = 2; // the width of the wall and celling/floor lines *needs better name
 
-    private World.World world;
-    private Renderer.WorldRenderer worldRender;
+    //private World.World world;
+    //private Renderer.WorldRenderer worldRender;
 
     private bool _isRunning = true;
 
     private static IntPtr window;
     private static IntPtr renderer;
+
+    SDL.SDL_Rect rect = new SDL.SDL_Rect();
+    SDL.SDL_Rect rectHor = new SDL.SDL_Rect();
+    SDL.SDL_Rect rectVer = new SDL.SDL_Rect();
+
+    private MazeCreator.MazeGenerator mazeGenerator = new MazeCreator.MazeGenerator(MazeWidth, MazeHeight);
 
     public MazeCreatorGUI()
     { }
@@ -29,11 +37,11 @@ internal class MazeCreatorGUI
         }
 
         // Create a new window given a title, size, and passes it a flag indicating it should be shown.
-        window = SDL.SDL_CreateWindow("Platformer", 
+        window = SDL.SDL_CreateWindow("Platformer",
             SDL.SDL_WINDOWPOS_UNDEFINED,
             SDL.SDL_WINDOWPOS_UNDEFINED,
-            Settings.ScreenWidthInPixels,
-            Settings.ScreenHeightInPixels,
+            MazeWidth * BlockWidth,
+            MazeHeight * BlockHeight,
             SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
 
         if (window == IntPtr.Zero)
@@ -58,8 +66,26 @@ internal class MazeCreatorGUI
             Console.WriteLine($"There was an issue initilizing SDL2_Image {SDL_image.IMG_GetError()}");
         }
 
-        world = new World.World();
-        worldRender = new Renderer.WorldRenderer(world, renderer, Settings.ScreenWidthInPixels, Settings.ScreenHeightInPixels, Settings.BlockLength);
+        //world = new World.World();
+        //worldRender = new Renderer.WorldRenderer(world, renderer, Settings.ScreenWidthInPixels, Settings.ScreenHeightInPixels, Settings.BlockLength);
+
+        // square
+        rect.h = BlockHeight;
+        rect.w = BlockWidth;
+        rect.x = 0;
+        rect.y = 0;
+
+        // horizantal wall
+        rectHor.h = BlockWallCelingWidth;
+        rectHor.w = BlockHeight;
+        rectHor.x = 0;
+        rectHor.y = 0;
+
+        // vertical celling/floor
+        rectVer.h = BlockWidth;
+        rectVer.w = BlockWallCelingWidth;
+        rectVer.x = 0;
+        rectVer.y = 0;
     }
 
     public void HandleInputs()
@@ -68,19 +94,72 @@ internal class MazeCreatorGUI
         {
             if (e.type == SDL.SDL_EventType.SDL_QUIT)
                 _isRunning = false;
-            else
-                world.Event(ref e);
+            //else
+            //    world.Event(ref e);
         }
     }
 
     public void Update(float delta = 17f)
     {
-        world.Update(delta);
+        mazeGenerator.StepForward();
     }
 
     public void Render(float delta)
     {
-        worldRender.RenderWorldToRenderer(delta);
+        SDL.SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL.SDL_RenderClear(renderer);
+
+        // draw maze
+        void DrawSquare(int x, int y, ref Maze.Block block, int xDrawPos, int yDrawPos)
+        {
+            if (mazeGenerator.blockHasInit[x, y])
+                SDL.SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            else
+                SDL.SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+            // draw iner square
+            rect.x = xDrawPos;
+            rect.y = yDrawPos;
+            SDL.SDL_RenderFillRect(renderer, ref rect);
+
+            // draw walls based of block
+            SDL.SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            // top*
+            if (!block.Up)
+            {
+                rectHor.x = xDrawPos;
+                rectHor.y = yDrawPos;
+                SDL.SDL_RenderFillRect(renderer, ref rectHor);
+            }
+            if (!block.Down)
+            {
+                rectHor.x = xDrawPos;
+                rectHor.y = yDrawPos + BlockHeight - BlockWallCelingWidth;
+                SDL.SDL_RenderFillRect(renderer, ref rectHor);
+            }
+            if (!block.Left)
+            {
+                rectVer.x = xDrawPos;
+                rectVer.y = yDrawPos;
+                SDL.SDL_RenderFillRect(renderer, ref rectVer);
+            }
+            if (!block.Right)
+            {
+                rectVer.x = xDrawPos + BlockWidth - BlockWallCelingWidth;
+                rectVer.y = yDrawPos;
+                SDL.SDL_RenderFillRect(renderer, ref rectVer);
+            }
+        }
+
+        for (int x = 0; x < mazeGenerator.maze.Width; x++)
+        {
+            for (int y = 0; y < mazeGenerator.maze.Height; y++)
+            {
+                DrawSquare(x, y, ref mazeGenerator.maze.maze[x, y], x * BlockWidth, y * BlockHeight);
+            }
+        }
+
+
         SDL.SDL_RenderPresent(renderer);
     }
 

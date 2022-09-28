@@ -1,21 +1,21 @@
 ﻿using System.Diagnostics;
 
-
+GUI.MazeCreatorGUI game = new();
 
 Stopwatch sw = new Stopwatch();
 float lastTime = 1;
 
 game.Init();
 
-while (game.IsRunning()) // ~100 cycles a second
+while (game.IsRunning()) // should probely make ít event bassed
 {
     sw.Restart();
 
     game.HandleInputs();
     game.Update(lastTime);
     game.Render(lastTime);
-    SDL.SDL_Delay(17);
 
+    //Thread.Sleep(50);
     lastTime = (float)sw.Elapsed.TotalMilliseconds;
 }
 
