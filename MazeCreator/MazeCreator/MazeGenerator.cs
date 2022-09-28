@@ -6,6 +6,7 @@
 // not sure how to fix the fackt there isent alot
 // one way i can think of is to have a serten amount of walkers at once(the tracer thingy(currentX,currentY))
 // so that from the start it goes out in more directions
+// when ever one cant go forward, it will follow back the trail, if it gets back to start, it dies
 // and whenever one dies, another one spawns from one of the other ones
 
 
@@ -28,6 +29,74 @@ internal struct Coord
     }
 }
 
+internal class Walker
+{
+    private Random rand = new Random();
+
+    public Stack<Coord> trail;
+    public Coord pos;
+
+    public int coordsTestetCount = 0;
+    private List<Coord> coordsTestet = new List<Coord>(4);
+
+    public Walker(Coord pos, int stackSize = 10)
+    {
+        this.pos = pos;
+        trail = new Stack<Coord>(stackSize);
+    }
+
+    public void GoToNewPos(Coord coord)
+    {
+        trail.Push(pos);
+        pos = coord;
+    }
+
+    public void GoToLastPos()
+    {
+        pos = trail.Pop();
+    }
+
+    public void ResetOffSet()
+    {
+        coordsTestetCount = 0;
+        coordsTestet.Clear();
+    }
+
+    public Coord GetOffSet()
+    {
+        if (coordsTestetCount == 4)
+            throw new Exception("gone over the max tested coords amount");
+
+        int x;
+        int y;
+
+        do
+        {
+            x = rand.Next(-1, 2);
+            y = rand.Next(-1, 2);
+        } while (
+        // both arent 0
+        (x == 0 && y == 0) ||
+
+        // diagonel
+        (x != 0 && y != 0) ||
+
+        // if it is allredy tested
+        coordsTestet.Contains(new Coord(x, y))
+        );
+
+        Console.WriteLine("(" + x + "," + y + ")");
+
+        return new Coord(x, y);
+    }
+
+    public void InvalidateOffSet(Coord offSet)
+    {
+        coordsTestetCount++;
+        coordsTestet.Add(offSet);
+    }
+}
+
 internal class MazeGenerator
 {
     private bool done = false;
@@ -38,127 +107,119 @@ internal class MazeGenerator
     public int endX;
     public int endY;
 
+    //public Stack<Coord> winingTrail;
+
+    public Maze maze;
+    public List<Walker> walkers;
+
     // for generation
     public bool[,] blockHasInit;
-    public Maze maze;
+    // amount of blocks that have been init
     public int step;
     public int stepsNeeded;
 
-    private Stack<Coord> trail;
-
-    private int currentX;
-    private int currentY;
-
-    public MazeGenerator(int width, int height)
+    public MazeGenerator(int width, int height, int walkersCount = -1)
     {
         blockHasInit = new bool[width, height];
         maze = new Maze(width, height);
         step = 0;
         stepsNeeded = width * height;
-        trail = new(width * height);
 
         // currently starts in top right and ends in buttom left
         startX = 0;
         startY = 0;
         endX = width - 1;
         endY = height - 1;
-        currentX = startX;
-        currentY = startY;
+
+        if (walkersCount == -1)
+            walkersCount = width * height / 500;
+        if (walkersCount < 2)
+            walkersCount = 2;
+
+        walkers = new List<Walker>(walkersCount);
+        for (int i = 0; i < walkersCount; i++)
+            walkers.Add(new Walker(new Coord(startX, startY)));
     }
 
     public void StepForward(int steps = 1)
     {
-        Random rand = new Random();
-        if (!maze.InBound(currentX, currentY))
-            return;
         if (done)
             return;
 
         for (int i = 0; i < steps; i++)
         {
             // generation code
-            //maze.maze[currentX, currentY] = new Maze.Block();
-            blockHasInit[currentX, currentY] = true;
 
-            int x;
-            int y;
-
-            // crap way of checking all the ways
-            List<Coord> coordsTested = new List<Coord>(4);
-            while (true)
+            // each walker
+            for (int walkerNum = 0; walkerNum < walkers.Count(); walkerNum++)
             {
-                do
+                Walker walker = walkers[walkerNum];
+
+                // each offSet until succes
+                while (true)
                 {
-                    x = rand.Next(-1, 2);
-                    y = rand.Next(-1, 2);
-                } while (
-                // remove 0,0
-                (x == 0 && y == 0) ||
-
-                // remove diagonel by making sure only one is not set to 0
-                !((x == 0 && y != 0) || (y == 0 && x != 0))
-                );
-
-                if (!coordsTested.Contains(new Coord(x, y)))
-                    coordsTested.Add(new(x, y));
-                else if (coordsTested.Count() != 4)
-                    continue;
-
-                if (maze.InBound(currentX + x, currentY + y))
-                {
-                    if (!blockHasInit[currentX + x, currentY + y])
+                    // make sure the walker is still valid
+                    bool JustSpawned = false;
+                    if (walker.coordsTestetCount == 4)
                     {
-                        trail.Push(new Coord(currentX, currentY));
-
-                        // make the block
-                        Maze.Direction dir = Maze.Direction.GetDirFromOffset(x, y);
-
-                        maze.Set(currentX, currentY, dir, true);
-
-                        dir.Reverse();
-                        currentX += x;
-                        currentY += y;
-
-                        maze.Set(currentX, currentY, dir, true);
-
-                        // this makes it so when we have reached the end, we will start from the start
-                        // and make branches from there instead of from the end
-                        if (currentX == endX && currentY == endY)
+                        if (walker.trail.Count() == 0)
                         {
-                            List<Coord> newTrail = new List<Coord>(trail.Count());
-                            for (int foo = 0; foo < trail.Count(); foo++)
-                                newTrail.Add(trail.Pop());
-                            for (int foo = 0; foo < newTrail.Count(); foo++)
-                                trail.Push(newTrail[foo]);
+                            // means it is dead and will spawn somewhere else
+                            // at another walker, and we know if it dies it isent the only one
+                            Random rand = new Random();
+                            while (true)
+                            {
+                                int newWalker = rand.Next(0, walkers.Count());
+                                if (newWalker == walkerNum)
+                                    continue;
+                                walker.pos = walkers[newWalker].pos;
+                                JustSpawned = true;
+                                break;
+                            }
 
-                            currentX = startX;
-                            currentY = startY;
-                            step++;
-                            blockHasInit[endX, endY] = true;
                         }
-
-                        step++;
-                        if (step == stepsNeeded)
-                        {
-                            done = true;
-                            blockHasInit[currentX, currentY] = true;
-                            return;
-                        }
-                        break;
+                        walker.ResetOffSet();
+                        if (JustSpawned)
+                            break;
+                        walker.GoToLastPos();
                     }
-                }
-                else
-                {
-                    // make a wall becous its out goes outside the maze
-                    // unless its the exit or the entrenss
-                }
+                    if (JustSpawned)
+                        break;
 
-                if (coordsTested.Count == 4)
-                {
-                    Coord coord = trail.Pop();
-                    currentX = coord.x;
-                    currentY = coord.y;
-                    Console.WriteLine("(" + currentX + "," + currentY + ")");
+                    // get not tested offSet
+                    Coord offSet = walker.GetOffSet();
+                    Coord newPos = new Coord(walker.pos.x + offSet.x, walker.pos.y + offSet.y);
+
+                    // check if valid offSet
+                    if (!maze.InBound(newPos.x, newPos.y) || blockHasInit[newPos.x, newPos.y])
+                    {
+                        walker.InvalidateOffSet(offSet);
+                        continue;
+                    }
+
+                    // got valid offSet
+                    Maze.Direction dir = Maze.Direction.GetDirFromOffset(offSet.x, offSet.y);
+                    maze.Set(walker.pos.x, walker.pos.y, dir, true);
+                    dir.Reverse();
+                    maze.Set(newPos.x, newPos.y, dir, true);
+                    blockHasInit[newPos.x, newPos.y] = true;
+
+                    walker.GoToNewPos(newPos);
+                    walker.ResetOffSet();
+
+                    step++;
+                    if (step == stepsNeeded)
+                    {
+                        done = true;
+                        return;
+                    }
+
+                    // check if landed on end
+                    if (newPos.x == endX && newPos.y == endY)
+                    {
+
+                    }
+
                     break;
                 }
             }
