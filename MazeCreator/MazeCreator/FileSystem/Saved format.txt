@@ -1,7 +1,11 @@
 ﻿The saved format will basicly be two 6 ints in the begining and rest is bytes
 the two first will be for the Width and Height
-3-4 is for start coord
-5-6 end coord
+0-3 width
+4-7 height
+8-11 startX
+12-15 startY
+16-19 endX
+20-23 endY
 
 the rest will be storing each square
 goes from top left to right (top left is 0,0) and a line is the width

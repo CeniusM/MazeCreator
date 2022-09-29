@@ -150,6 +150,11 @@ internal class Maze
     public int Width { get { return width; } }
     public Block[,] maze;
 
+    public int startX;
+    public int startY;
+    public int endX;
+    public int endY;
+
     public Maze(int w, int h)
     {
         width = w;

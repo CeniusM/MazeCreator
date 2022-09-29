@@ -100,11 +100,6 @@ internal class MazeGenerator
     private bool done = false;
     public bool Done { get { return done; } }
 
-    public int startX;
-    public int startY;
-    public int endX;
-    public int endY;
-
     //public Stack<Coord> winingTrail;
 
     public Maze maze;
@@ -126,10 +121,10 @@ internal class MazeGenerator
         this.stepsPerRound = stepsPerRound;
 
         // currently starts in top right and ends in buttom left
-        startX = 0;
-        startY = 0;
-        endX = width - 1;
-        endY = height - 1;
+        maze.startX = 0;
+        maze.startY = 0;
+        maze.endX = width - 1;
+        maze.endY = height - 1;
 
         if (walkersCount == -1)
             walkersCount = width * height / 500;
@@ -138,15 +133,21 @@ internal class MazeGenerator
 
         walkers = new List<Walker>(walkersCount);
         for (int i = 0; i < walkersCount; i++)
-            walkers.Add(new Walker(new Coord(startX, startY)));
+            walkers.Add(new Walker(new Coord(maze.startX, maze.startY)));
     }
 
+    /// <summary>
+    /// -1/none = preset steps amount, 0 = set steps to the max amout(finish imiatly), num > 0 = steps
+    /// </summary>
+    /// <param name="steps"></param>
     public void StepForward(int steps = -1)
     {
         if (done)
             return;
         if (steps == -1)
             steps = stepsPerRound;
+        if (steps == 0)
+            steps = stepsNeeded - step;
         for (int i = 0; i < steps; i++)
         {
             // generation code
@@ -216,7 +217,7 @@ internal class MazeGenerator
                     }
 
                     // check if landed on end
-                    if (newPos.x == endX && newPos.y == endY)
+                    if (newPos.x == maze.endX && newPos.y == maze.endY)
                     {
                         
                     }

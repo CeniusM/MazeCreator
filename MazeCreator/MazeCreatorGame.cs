@@ -5,10 +5,10 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public /*const*/static int MazeHeight = 80; // the maze's dimensions
-    public /*const*/static int MazeWidth = 80;
-    public /*const*/static int BlockHeight = 10; //4 each block in maze dimensions in pixels
-    public /*const*/static int BlockWidth = 10;
+    public /*const*/static int MazeHeight = 140; // the maze's dimensions
+    public /*const*/static int MazeWidth = 140;
+    public /*const*/static int BlockHeight = 7; //4 each block in maze dimensions in pixels
+    public /*const*/static int BlockWidth = 7;
     public /*const*/static int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
     public /*const*/static int HalfBlockWallCelingWidth = BlockWallCelingWidth >> 1; // used to remove jaget cornors at wider walls -
     // only problem is that you also have to move every wall this amount up(rectVer) or the the left(rectHor), and make it BlockWallCelingWidth taller and wider
@@ -41,7 +41,7 @@ internal class MazeCreatorGUI
 
         rect.w = BlockWidth;
         rectHor.w = BlockWidth;
-        
+
         rectHor.h = BlockWallCelingWidth;
         rectVer.w = BlockWallCelingWidth;
 
@@ -157,10 +157,28 @@ internal class MazeCreatorGUI
         }
     }
 
+    private bool AllredySaved = false;
     public void Update(float delta = 17f)
     {
         if (!_paused)
             mazeGenerator.StepForward();
+
+        //if (mazeGenerator.Done && !AllredySaved)
+        //{
+        //    const string path = "C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save.txt";
+        //    Console.WriteLine("Saving...");
+        //    byte[] bytes = MazeCreator.FileSystem.Saver.GetBytes(mazeGenerator.maze);
+        //    //MazeCreator.FileSystem.Saver.WriteSaveToFile("C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save.Bytes", bytes);
+        //    File.WriteAllBytes(path, bytes);
+            
+        //    Console.WriteLine("Saved");
+
+        //    // load
+
+        //    //Console.WriteLine("Loaded");
+
+        //    AllredySaved = true;
+        //}
     }
 
     public void Render(float delta)
@@ -219,12 +237,12 @@ internal class MazeCreatorGUI
         }
 
         //  +- BlockWallCelingWidth so it dosent block the walls
-        rect.x = mazeGenerator.startX * BlockWidth - BlockWallCelingWidth;
-        rect.y = mazeGenerator.startY * BlockWidth - BlockWallCelingWidth;
+        rect.x = mazeGenerator.maze.startX * BlockWidth - BlockWallCelingWidth;
+        rect.y = mazeGenerator.maze.startY * BlockWidth - BlockWallCelingWidth;
         SDL.SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL.SDL_RenderFillRect(renderer, ref rect);
-        rect.x = mazeGenerator.endX * BlockWidth + BlockWallCelingWidth;
-        rect.y = mazeGenerator.endY * BlockWidth + BlockWallCelingWidth;
+        rect.x = mazeGenerator.maze.endX * BlockWidth + BlockWallCelingWidth;
+        rect.y = mazeGenerator.maze.endY * BlockWidth + BlockWallCelingWidth;
         SDL.SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL.SDL_RenderFillRect(renderer, ref rect);
 
