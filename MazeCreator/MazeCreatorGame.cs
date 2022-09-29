@@ -5,10 +5,10 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public /*const*/static int MazeHeight = 140; // the maze's dimensions
-    public /*const*/static int MazeWidth = 140;
-    public /*const*/static int BlockHeight = 7; //4 each block in maze dimensions in pixels
-    public /*const*/static int BlockWidth = 7;
+    public /*const*/static int MazeHeight = 300; // the maze's dimensions
+    public /*const*/static int MazeWidth = 300;
+    public /*const*/static int BlockHeight = 3; //4 each block in maze dimensions in pixels
+    public /*const*/static int BlockWidth = 3;
     public /*const*/static int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
     public /*const*/static int HalfBlockWallCelingWidth = BlockWallCelingWidth >> 1; // used to remove jaget cornors at wider walls -
     // only problem is that you also have to move every wall this amount up(rectVer) or the the left(rectHor), and make it BlockWallCelingWidth taller and wider
@@ -160,25 +160,53 @@ internal class MazeCreatorGUI
     private bool AllredySaved = false;
     public void Update(float delta = 17f)
     {
+        const string path = "C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save";
+
+
+
         if (!_paused)
             mazeGenerator.StepForward();
 
-        //if (mazeGenerator.Done && !AllredySaved)
-        //{
-        //    const string path = "C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save.txt";
-        //    Console.WriteLine("Saving...");
-        //    byte[] bytes = MazeCreator.FileSystem.Saver.GetBytes(mazeGenerator.maze);
-        //    //MazeCreator.FileSystem.Saver.WriteSaveToFile("C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save.Bytes", bytes);
-        //    File.WriteAllBytes(path, bytes);
-            
-        //    Console.WriteLine("Saved");
+        const bool loading = true;
+        const bool neither = true;
 
-        //    // load
+        if (!neither)
+        {
+            if (loading)
+            {
+                if (!AllredySaved)
+                {
+                    mazeGenerator.LoadMaze(MazeCreator.FileSystem.Loader.LoadMaze(path));
+                    AllredySaved = true;
+                }
+            }
+            else
+            {
+                if (mazeGenerator.Done && !AllredySaved)
+                {
+                    Console.WriteLine("Saving...");
+                    byte[] bytes = MazeCreator.FileSystem.Saver.GetBytes(mazeGenerator.maze);
+                    MazeCreator.FileSystem.Saver.WriteSaveToFile(path, bytes);
 
-        //    //Console.WriteLine("Loaded");
+                    //try
+                    //{
+                    //    File.WriteAllBytes(path, bytes);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Console.WriteLine(ex.Message);
+                    //}
 
-        //    AllredySaved = true;
-        //}
+                    Console.WriteLine("Saved");
+
+                    // load
+
+                    //Console.WriteLine("Loaded");
+
+                    AllredySaved = true;
+                }
+            }
+        }
     }
 
     public void Render(float delta)

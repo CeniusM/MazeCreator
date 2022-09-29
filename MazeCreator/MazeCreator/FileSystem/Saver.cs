@@ -10,15 +10,20 @@ internal unsafe class Saver
 {
     public static void WriteSaveToFile(string path, byte[] bytes)
     {
-        //Console.WriteLine(path);
-        //Console.WriteLine(bytes.Length);
+        Console.WriteLine(path);
+        Console.WriteLine(bytes.Length);
 
         //File.WriteAllBytes(path, bytes);
+
+        using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read))
+        {
+            fs.Write(bytes, 0, bytes.Length);
+        }
     }
 
     public static byte[] GetBytes(Maze maze)
     {
-        byte[] bytes = new byte[(4 * 6) + maze.Height * maze.Width];
+        byte[] bytes = new byte[(4 * 6) + maze.Height * maze.Width * 4];
 
         fixed (byte* bytesPtr = bytes)
         {
