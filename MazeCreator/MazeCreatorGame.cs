@@ -5,12 +5,12 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public const int MazeHeight = 20; // the maze's dimensions
-    public const int MazeWidth = 20;
-    public const int BlockHeight = 20; // each block in maze dimensions in pixels
-    public const int BlockWidth = 20;
-    public const int BlockWallCelingWidth = 6; // the width of the wall and celling/floor lines *needs better name
-    public const int HalfBlockWallCelingWidth = BlockWallCelingWidth >> 1; // used to remove jaget cornors at wider walls -
+    public /*const*/static int MazeHeight = 80; // the maze's dimensions
+    public /*const*/static int MazeWidth = 80;
+    public /*const*/static int BlockHeight = 10; //4 each block in maze dimensions in pixels
+    public /*const*/static int BlockWidth = 10;
+    public /*const*/static int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
+    public /*const*/static int HalfBlockWallCelingWidth = BlockWallCelingWidth >> 1; // used to remove jaget cornors at wider walls -
     // only problem is that you also have to move every wall this amount up(rectVer) or the the left(rectHor), and make it BlockWallCelingWidth taller and wider
 
     private bool _isRunning = true;
@@ -27,6 +27,31 @@ internal class MazeCreatorGUI
 
     public MazeCreatorGUI()
     { }
+
+    private void ResizeWindow(int mazeX, int mazeY, int blockX, int blockY, int lineWidth)
+    {
+        MazeHeight += mazeY;
+        MazeWidth += mazeX;
+        BlockHeight += blockY;
+        BlockWidth += blockX;
+        BlockWallCelingWidth += lineWidth;
+
+        rect.h = BlockHeight;
+        rectVer.h = BlockHeight;
+
+        rect.w = BlockWidth;
+        rectHor.w = BlockWidth;
+        
+        rectHor.h = BlockWallCelingWidth;
+        rectVer.w = BlockWallCelingWidth;
+
+        SDL.SDL_SetWindowSize(window, BlockWidth * MazeWidth, BlockHeight * MazeHeight);
+        //renderer = SDL.SDL_CreateRenderer(window,
+        //                                        -1,
+        //                                        SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED |
+        //                                        SDL.SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
+        mazeGenerator = new MazeCreator.MazeGenerator(MazeWidth, MazeHeight);
+    }
 
     public void Init()
     {
@@ -96,6 +121,39 @@ internal class MazeCreatorGUI
                 _isRunning = false;
             else if (e.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN)
                 _paused = !_paused;
+            else if (e.type == SDL.SDL_EventType.SDL_KEYDOWN)
+            {
+                if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_DOWN)
+                {
+                    ResizeWindow(0, 1, 0, 0, 0);
+                }
+                else if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_UP)
+                {
+                    ResizeWindow(0, -1, 0, 0, 0);
+                }
+                else if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_RIGHT)
+                {
+                    ResizeWindow(1, 0, 0, 0, 0);
+                }
+                else if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_LEFT)
+                {
+                    ResizeWindow(-1, 0, 0, 0, 0);
+                }
+                else if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_PLUS)
+                {
+                    ResizeWindow(0, 0, 1, 1, 0);
+                }
+                else if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_MINUS)
+                {
+                    ResizeWindow(0, 0, -1, -1, 0);
+                }
+                else if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_SPACE)
+                {
+                    mazeGenerator = new MazeCreator.MazeGenerator(MazeWidth, MazeHeight);
+                }
+
+
+            }
         }
     }
 

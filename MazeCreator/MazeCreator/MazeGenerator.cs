@@ -3,6 +3,7 @@
 // maby make them spawn and despawn depending on some facktors that has to do with hpw much they are squishing
 //
 // alot if long kinda wires, fewer walkers the less of a problem
+// or if a walker walks in the same dir for some time kill it
 //
 // one problem may be that the middle roads pretty much allways leads the the end,
 // one way of fixing this is maby to slow down the closer they get to the end compared to how far the other workers are
