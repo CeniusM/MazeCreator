@@ -5,10 +5,10 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public /*const*/static int MazeHeight = 300; // the maze's dimensions
-    public /*const*/static int MazeWidth = 300;
-    public /*const*/static int BlockHeight = 3; //4 each block in maze dimensions in pixels
-    public /*const*/static int BlockWidth = 3;
+    public /*const*/static int MazeHeight = 100; // the maze's dimensions
+    public /*const*/static int MazeWidth = 100;
+    public /*const*/static int BlockHeight = 8; //4 each block in maze dimensions in pixels
+    public /*const*/static int BlockWidth = 8;
     public /*const*/static int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
     public /*const*/static int HalfBlockWallCelingWidth = BlockWallCelingWidth >> 1; // used to remove jaget cornors at wider walls -
     // only problem is that you also have to move every wall this amount up(rectVer) or the the left(rectHor), and make it BlockWallCelingWidth taller and wider
