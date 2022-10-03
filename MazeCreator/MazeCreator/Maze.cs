@@ -155,11 +155,22 @@ internal class Maze
     public int endX;
     public int endY;
 
-    public Maze(int w, int h)
+    public Maze(int w, int h, int StartX = 0, int StartY = 0, int EndX = 0, int EndY = 0)
     {
         width = w;
         height = h;
         maze = new Block[width, height];
+
+        startX = StartX;
+        startY = StartY;
+        endX = EndX;
+        endY = EndY;
+
+        if (startX == EndX && startY == EndY)
+        {
+            EndX = width - 1;
+            EndY = height - 1;
+        }
     }
 
     public bool IsMoveValid(int x, int y, Direction dir)

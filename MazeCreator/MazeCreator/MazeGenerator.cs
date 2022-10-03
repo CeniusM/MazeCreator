@@ -244,4 +244,17 @@ internal class MazeGenerator
             }
         }
     }
+
+    internal void LoadMaze(Maze maze)
+    {
+        this.maze = maze;
+        done = true;
+        for (int i = 0; i < blockHasInit.GetLength(0); i++)
+        {
+            for (int j = 0; j < blockHasInit.GetLength(1); j++)
+            {
+                blockHasInit[i, j] = true;
+            }
+        }
+    }
 }

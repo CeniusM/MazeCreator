@@ -5,6 +5,11 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
+    public /*const*/static int MazeHeight = 100; // the maze's dimensions
+    public /*const*/static int MazeWidth = 100;
+    public /*const*/static int BlockHeight = 8; //4 each block in maze dimensions in pixels
+    public /*const*/static int BlockWidth = 8;
+    public /*const*/static int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
     public /*const*/static int MazeHeight = 50; // the maze's dimensions
     public /*const*/static int MazeWidth = 50;
     public /*const*/static int BlockHeight = 15; //4 each block in maze dimensions in pixels
@@ -165,6 +170,12 @@ internal class MazeCreatorGUI
     private bool AllredySaved = false;
     public void Update(float delta = 17f)
     {
+        const string path = "C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save";
+
+
+
+        if (!_paused)
+            mazeGenerator.StepForward();
         if (_paused)
             return;
 
@@ -175,6 +186,37 @@ internal class MazeCreatorGUI
             mazeSolver.Step(10);
         }
 
+        const bool loading = true;
+        const bool neither = true;
+
+        if (!neither)
+        {
+            if (loading)
+            {
+                if (!AllredySaved)
+                {
+                    mazeGenerator.LoadMaze(MazeCreator.FileSystem.Loader.LoadMaze(path));
+                    AllredySaved = true;
+                }
+            }
+            else
+            {
+                if (mazeGenerator.Done && !AllredySaved)
+                {
+                    Console.WriteLine("Saving...");
+                    byte[] bytes = MazeCreator.FileSystem.Saver.GetBytes(mazeGenerator.maze);
+                    MazeCreator.FileSystem.Saver.WriteSaveToFile(path, bytes);
+
+                    //try
+                    //{
+                    //    File.WriteAllBytes(path, bytes);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Console.WriteLine(ex.Message);
+                    //}
+
+                    Console.WriteLine("Saved");
         //if (mazeGenerator.Done && !AllredySaved)
         //{
         //    const string path = "C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save.txt";
@@ -185,12 +227,14 @@ internal class MazeCreatorGUI
 
         //    Console.WriteLine("Saved");
 
-        //    // load
+                    // load
 
-        //    //Console.WriteLine("Loaded");
+                    //Console.WriteLine("Loaded");
 
-        //    AllredySaved = true;
-        //}
+                    AllredySaved = true;
+                }
+            }
+        }
     }
 
     public void Render(float delta)
