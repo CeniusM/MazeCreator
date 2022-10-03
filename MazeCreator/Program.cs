@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
 GUI.MazeCreatorGUI game = new();
+Benchy.Benchmarking.Start();
 
 Stopwatch sw = new Stopwatch();
 float lastTime = 1;

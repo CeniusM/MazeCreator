@@ -5,11 +5,11 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public /*const*/static int MazeHeight = 140; // the maze's dimensions
-    public /*const*/static int MazeWidth = 140;
-    public /*const*/static int BlockHeight = 7; //4 each block in maze dimensions in pixels
-    public /*const*/static int BlockWidth = 7;
-    public /*const*/static int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
+    public /*const*/static int MazeHeight = 50; // the maze's dimensions
+    public /*const*/static int MazeWidth = 50;
+    public /*const*/static int BlockHeight = 15; //4 each block in maze dimensions in pixels
+    public /*const*/static int BlockWidth = 15;
+    public /*const*/static int BlockWallCelingWidth = 2; // the width of the wall and celling/floor lines *needs better name
     public /*const*/static int HalfBlockWallCelingWidth = BlockWallCelingWidth >> 1; // used to remove jaget cornors at wider walls -
     // only problem is that you also have to move every wall this amount up(rectVer) or the the left(rectHor), and make it BlockWallCelingWidth taller and wider
 
@@ -24,9 +24,12 @@ internal class MazeCreatorGUI
     SDL.SDL_Rect rectVer = new SDL.SDL_Rect();
 
     private MazeCreator.MazeGenerator mazeGenerator = new MazeCreator.MazeGenerator(MazeWidth, MazeHeight);
+    private MazeSolver.CheckAllPathsRandom mazeSolver;
 
     public MazeCreatorGUI()
-    { }
+    {
+        mazeSolver = new MazeSolver.CheckAllPathsRandom(mazeGenerator.maze);
+    }
 
     private void ResizeWindow(int mazeX, int mazeY, int blockX, int blockY, int lineWidth)
     {
@@ -51,6 +54,7 @@ internal class MazeCreatorGUI
         //                                        SDL.SDL_RendererFlags.SDL_RENDERER_ACCELERATED |
         //                                        SDL.SDL_RendererFlags.SDL_RENDERER_PRESENTVSYNC);
         mazeGenerator = new MazeCreator.MazeGenerator(MazeWidth, MazeHeight);
+        mazeSolver = new MazeSolver.CheckAllPathsRandom(mazeGenerator.maze);
     }
 
     public void Init()
@@ -150,6 +154,7 @@ internal class MazeCreatorGUI
                 else if (e.key.keysym.sym == SDL.SDL_Keycode.SDLK_SPACE)
                 {
                     mazeGenerator = new MazeCreator.MazeGenerator(MazeWidth, MazeHeight);
+                    mazeSolver = new MazeSolver.CheckAllPathsRandom(mazeGenerator.maze);
                 }
 
 
@@ -160,8 +165,15 @@ internal class MazeCreatorGUI
     private bool AllredySaved = false;
     public void Update(float delta = 17f)
     {
-        if (!_paused)
-            mazeGenerator.StepForward();
+        if (_paused)
+            return;
+
+        mazeGenerator.StepForward(10);
+        if (mazeGenerator.Done)
+        {
+            // solve maze
+            mazeSolver.Step(10);
+        }
 
         //if (mazeGenerator.Done && !AllredySaved)
         //{
@@ -170,7 +182,7 @@ internal class MazeCreatorGUI
         //    byte[] bytes = MazeCreator.FileSystem.Saver.GetBytes(mazeGenerator.maze);
         //    //MazeCreator.FileSystem.Saver.WriteSaveToFile("C:\\Users\\ceniu\\source\\repos\\MazeCreator\\MazeCreator\\MazeCreator\\FileSystem\\save.Bytes", bytes);
         //    File.WriteAllBytes(path, bytes);
-            
+
         //    Console.WriteLine("Saved");
 
         //    // load
@@ -187,12 +199,15 @@ internal class MazeCreatorGUI
         SDL.SDL_RenderClear(renderer);
 
         // draw maze
-        void DrawSquare(int x, int y, ref Maze.Block block, int xDrawPos, int yDrawPos)
+        void DrawSquare(int x, int y, ref Maze.Block block, int xDrawPos, int yDrawPos, bool drawColorSet = false)
         {
-            if (mazeGenerator.blockHasInit[x, y])
-                SDL.SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-            else
-                SDL.SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            if (!drawColorSet)
+            {
+                if (mazeGenerator.blockHasInit[x, y])
+                    SDL.SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                else
+                    SDL.SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            }
 
             // draw iner square
             rect.x = xDrawPos;
@@ -233,6 +248,25 @@ internal class MazeCreatorGUI
             for (int y = 0; y < mazeGenerator.maze.Height; y++)
             {
                 DrawSquare(x, y, ref mazeGenerator.maze.maze[x, y], x * BlockWidth, y * BlockHeight);
+            }
+        }
+
+        if (mazeGenerator.Done)
+        {
+            for (int x = 0; x < mazeGenerator.maze.Width; x++)
+                for (int y = 0; y < mazeGenerator.maze.Height; y++)
+                    if (mazeSolver.Checked[x, y])
+                    {
+                        SDL.SDL_SetRenderDrawColor(renderer, 255, 0, 100, 255);
+                        DrawSquare(x, y, ref mazeGenerator.maze.maze[x, y], x * BlockWidth, y * BlockHeight, true);
+                    }
+
+            Coord[] trail = mazeSolver.walker.GetTrail();
+            for (int i = 0; i < trail.Length; i++)
+            {
+                int x = trail[i].x, y = trail[i].y;
+                SDL.SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+                DrawSquare(x, y, ref mazeGenerator.maze.maze[x, y], x * BlockWidth, y * BlockHeight, true);
             }
         }
 
