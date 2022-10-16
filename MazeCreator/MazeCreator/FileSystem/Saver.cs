@@ -38,9 +38,9 @@ internal unsafe class Saver
 
             // used for the map
             byte* ptr = &bytesPtr[24];
-            for (int i = 0; i < maze.Width; i++)
+            for (int j = 0; j < maze.Height; j++)
             {
-                for (int j = 0; j < maze.Height; j++)
+                for (int i = 0; i < maze.Width; i++)
                 {
                     ptr[i * 4 + (j * maze.Width * 4) + 0] = Convert.ToByte(maze.maze[i, j].Up);
                     ptr[i * 4 + (j * maze.Width * 4) + 1] = Convert.ToByte(maze.maze[i, j].Down);
