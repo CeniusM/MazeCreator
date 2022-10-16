@@ -5,11 +5,6 @@ namespace GUI;
 
 internal class MazeCreatorGUI
 {
-    public /*const*/static int MazeHeight = 100; // the maze's dimensions
-    public /*const*/static int MazeWidth = 100;
-    public /*const*/static int BlockHeight = 8; //4 each block in maze dimensions in pixels
-    public /*const*/static int BlockWidth = 8;
-    public /*const*/static int BlockWallCelingWidth = 1; // the width of the wall and celling/floor lines *needs better name
     public /*const*/static int MazeHeight = 50; // the maze's dimensions
     public /*const*/static int MazeWidth = 50;
     public /*const*/static int BlockHeight = 15; //4 each block in maze dimensions in pixels
