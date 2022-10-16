@@ -226,4 +226,14 @@ internal class Maze
         else
             return true;
     }
+
+    public void LoadLevel(byte[] bytes)
+    {
+        throw new NotImplementedException();
+    }
+
+    public byte[] GetLevel()
+    {
+        throw new NotImplementedException();
+    }
 }

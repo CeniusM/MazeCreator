@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace MazeCreator;
 
-internal struct Coord
+public struct Coord
 {
     public int x, y;
 
@@ -26,6 +26,16 @@ internal struct Coord
     {
         this.x = x;
         this.y = y;
+    }
+
+    public static bool operator ==(Coord one, Coord two)
+    {
+        return (one.x == two.x && one.y == two.y);
+    }
+
+    public static bool operator !=(Coord one, Coord two)
+    {
+        return (one.x != two.x || one.y != two.y);
     }
 }
 
@@ -92,6 +102,13 @@ internal class Walker
     {
         coordsTestetCount++;
         coordsTestet.Add(offSet);
+    }
+
+    public Coord[] GetTrail()
+    {
+        Coord[] coords = new Coord[trail.Count];
+        trail.CopyTo(coords, 0);
+        return coords;
     }
 }
 
@@ -219,7 +236,7 @@ internal class MazeGenerator
                     // check if landed on end
                     if (newPos.x == maze.endX && newPos.y == maze.endY)
                     {
-                        
+
                     }
 
                     break;
